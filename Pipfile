@@ -1,0 +1,37 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+python-dotenv = "*"
+aiohttp = "*"
+openai = "*"
+numpy = "*"
+fastapi = "*"
+sqlalchemy = "*"
+alembic = "*"
+pgvector = "*"
+greenlet = "*"
+asyncpg = "*"
+uvicorn = "*"
+pandas = "*"
+joblib = "*"
+packaging = "*"
+orjson = "*"
+langchain = "*"
+langchain-openai = "*"
+langchain-deepseek-official = "*"
+langchain-postgres = "*"
+langchain-community = "*"
+langgraph = "*"
+redis.asyncio = "*"
+sqlparse = "*"
+python-multipart = "*"
+moviepy = "*"
+opencv-python = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.13"

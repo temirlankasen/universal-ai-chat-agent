@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  chat-agent:
+    image: chat-agent:local
+    build: .
+    volumes:
+      - ./.env:/project/app/.env
+    ports:
+      - "8000:80"
+  postgres:
+    image: pgvector/pgvector:pg17
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: chat_agents
+    ports:
+      - "5433:5432"
+volumes:
+  postgres_data:
