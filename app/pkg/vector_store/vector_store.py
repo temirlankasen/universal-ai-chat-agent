@@ -47,15 +47,19 @@ class VectorStore:
         """
         if group:
             await self.vector_store.adelete(filter={"group": group})
+            self.logger.debug(f"Удалены документы группы: {group}")
         else:
             await self.vector_store.adelete_collection()
+            self.logger.debug("Удалена коллекция")
             await self.vector_store.acreate_collection()
+            self.logger.debug("Создана коллекция")
 
     async def build_qa_dataset(self, dataset_input: list[dict], group: str | None = None):
         """
         Принимает датасет (список словарей: id, theme, question, answer).
         Если group задан, добавляет его в metadata каждого документа и удаляет старые документы с этим group.
         """
+        self.logger.debug("Датасет в готовой QA")
         documents = []
         for item in dataset_input:
             metadata = {}
@@ -73,25 +77,24 @@ class VectorStore:
 
         await self._prepare_group(group)
         await self.vector_store.aadd_documents(documents=documents)
+        self.logger.debug(f"Добавлено {len(documents)} документов")
 
     async def build_ready_format_dataset(self, dataset_input: list[dict], group: str | None = None):
         """
         Принимает датасет (список словарей: id, page_content, metadata).
         """
-
+        self.logger.debug("Датасет в готовой форме")
         documents = []
         for key, item in enumerate(dataset_input):
-            document_id = item.get("id")
+            external_id = item.get("id", key)
             metadata = item.get("metadata", {})
-            if not document_id:
-                metadata["index"] = key
-            else:
-                metadata["index"] = document_id
+
+            if external_id:
+                metadata["external_id"] = external_id
             if group:
                 metadata["group"] = group
 
             document = Document(
-                id=document_id,
                 page_content=item.get("page_content"),
                 metadata=metadata,
             )
@@ -99,11 +102,13 @@ class VectorStore:
 
         await self._prepare_group(group)
         await self.vector_store.aadd_documents(documents=documents)
+        self.logger.debug(f"Добавлено {len(documents)} документов")
 
     async def build_sql_dataset(self, dataset_input: str, group: str | None = None):
         """
         Продумать парсинг для SQL
         """
+        self.logger.debug("Датасет в форме SQL")
         pass
 
     async def build_docs_dataset(self, dataset_input: list[str], group: str | None = None):
@@ -111,6 +116,7 @@ class VectorStore:
         Принимает список строк и создает документы для каждой строки.
         Подразумевается, что это уже разбитые данные.
         """
+        self.logger.debug("Датасет из нескольких страниц")
         documents = []
         for index, item in enumerate(dataset_input):
             metadata = {"doc_index": index}
@@ -121,6 +127,7 @@ class VectorStore:
 
         await self._prepare_group(group)
         await self.vector_store.aadd_documents(documents=documents)
+        self.logger.debug(f"Добавлено {len(documents)} документов")
 
     async def build_txt_dataset(self, dataset_input: str, delimiter: str = "\n\n", group: str | None = None, chunk_size: int|None = None, overlap_size: int|None = None):
         """
@@ -128,6 +135,7 @@ class VectorStore:
         и сохраняет документы. Если group передан – добавляет его в metadata.
         """
         # todo добавить chunk_size, overlap_size
+        self.logger.debug("Датасет в форме одного текстового документа")
         chunks = dataset_input.split(delimiter)
 
         documents = []
@@ -140,6 +148,7 @@ class VectorStore:
 
         await self._prepare_group(group)
         await self.vector_store.aadd_documents(documents=documents)
+        self.logger.debug(f"Добавлено {len(documents)} документов")
 
     async def build_dataset(self, dataset_input: list[dict] | str | list[str], group: str | None = None):
         if len(dataset_input) == 0:

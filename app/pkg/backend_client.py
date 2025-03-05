@@ -29,6 +29,8 @@ class BackendClient:
                     dataset = data.get("content", {}).get("dataset")
                     if not dataset:
                         raise Exception("Пустой датасет")
+                    else:
+                        self.logger.debug(f"Получен датасет: {len(dataset)}")
                     return dataset
                 except Exception as e:
                     self.logger.error(f"Ошибка при парсинге датасета: {e}")
